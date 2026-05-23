@@ -8,7 +8,7 @@ from random import choices
 def evolve(gen_count, top_agent):
 	print(f"Generation: {gen_count}, Last top agent score: {top_agent.fitness()}")
 	top_agent.reset_score()
-	agents = top_agent.mutate(10, .1) + [Agent() for _ in range(5)]
+	agents = top_agent.mutate(10, diversity=.06) + top_agent.mutate(5,diversity=.3) + [Agent() for _ in range(5)]
 
 	# matchmaking
 	for agent1 in agents:
@@ -35,7 +35,7 @@ for i in range(generations):
 
 # play top_agent with random player
 top_agent.reset_score()
-random_count = 30
+random_count = 50
 for i in range(random_count):
 	random = Agent(f"Random {i}")
 	# print("Random (O) v Top Agent (X): ", end="")

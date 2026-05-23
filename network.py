@@ -57,6 +57,6 @@ class Network():
 	def mutate(self, diversity=.1):
 		net = Network(*self.design)
 		for i in range(len(self.layers)):
-			net.layers[i].weights = self.layers[i].weights * (1+diversity*random())
-			net.layers[i].biases = self.layers[i].biases * (1+diversity*random())
+			net.layers[i].weights = self.layers[i].weights + np.random.randn(*self.layers[i].weights.shape)*diversity
+			net.layers[i].biases = self.layers[i].biases * np.random.randn(*self.layers[i].biases.shape)*diversity
 		return net

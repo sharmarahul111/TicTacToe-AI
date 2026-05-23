@@ -31,9 +31,12 @@ class Player:
 		return s
 	
 	def fitness(self):
-		return self.score[0]*4
-		self.score[1]*1
-		self.score[2]*0
+		win = 4
+		draw = -1
+		loss = -5
+		return self.score[0]*win
+		self.score[1]*draw
+		self.score[2]*loss
 
 
 class Human(Player):
