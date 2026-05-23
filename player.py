@@ -24,19 +24,18 @@ class Player:
 	
 	def __str__(self):
 		s = "Player: "+self.code
-		s+= f"\n\t Games = {self.games}"
-		s+= f"\n\t Wins = {self.score[0]}"
-		s+= f"\n\t Draws = {self.score[1]}"
-		s+= f"\n\t Loss = {self.score[2]}"
+		s+= f", Games = {self.games}"
+		s+= f", Wins = {self.score[0]}"
+		s+= f", Draws = {self.score[1]}"
+		s+= f", Loss = {self.score[2]}"
 		return s
 	
 	def fitness(self):
-		win = 4
-		draw = -1
-		loss = -5
-		return self.score[0]*win
-		self.score[1]*draw
-		self.score[2]*loss
+		win = 10
+		draw = 3
+		loss = -10
+		if self.games == 0: return 0
+		return (self.score[0]*win +self.score[1]*draw +self.score[2]*loss)/self.games
 
 
 class Human(Player):
@@ -52,7 +51,7 @@ class Agent(Player):
 		super().__init__(code or generate_id())
 		# 9 inputs for each cell having (-1,0,1)
 		# 9 outputs as probabilities
-		self.network = Network(9,16,16,9)
+		self.network = Network(9,12,9)
 	
 	def move(self, grid):
 		# move logic
