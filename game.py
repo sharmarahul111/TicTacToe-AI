@@ -41,15 +41,42 @@ class Game:
 
 	def check_game_over(self):
 		game_over = False
+		# print(np.count_nonzero(self.grid))
 		# check if the cells are filled
 		if np.count_nonzero(self.grid) == 9:
+			return True
+		if self.check_match_three():
 			game_over = True
-			return game_over
-		# check for win/lose condition
-		
-
-
 		return game_over
+	
+	def check_match_three(self):
+		winner = 0
+		# check for win/lose condition
+		# check matching rows
+		for i in range(3):
+			if (self.grid[i][0] != 0) and np.all(self.grid[i] == self.grid[i][0]):
+				winner = self.grid[i][0]
+
+		# check matching columns
+		for i in range(3):
+			if (self.grid[:,i][0] != 0) and np.all(self.grid[:, i] == self.grid[:,i][0]):
+				winner = self.grid[:,i][0]
+		
+		# check diagonals
+		# major
+		arr = np.zeros(3, dtype=int)
+		for i in range(3):
+			arr[i] = self.grid[i][i]
+		if (arr[0] != 0) and np.all(arr == arr[0]):
+			winner = arr[0]
+		
+		# minor
+		for i in range(3):
+			arr[i] = self.grid[i][-i-1]
+		if (arr[0] != 0) and np.all(arr == arr[0]):
+			winner = arr[0]
+
+		return winner
 
 
 	def match(self, mode="silent"):
@@ -60,3 +87,19 @@ class Game:
 			# for visual purpose
 			if mode != "silent":
 				self.draw()
+		score = self.check_match_three()
+		# print("Game score: ", self.check_match_three())
+		# assuming player_A = 1, player_B = -1
+
+		self.player_A.games += 1
+		self.player_B.games += 1
+		if score == 1:
+			self.player_A.score += 3
+			self.player_B.score += 1
+		elif score == -1:
+			self.player_A.score += 1
+			self.player_B.score += 3
+		else:
+			self.player_A.score += 2
+			self.player_B.score += 2
+
