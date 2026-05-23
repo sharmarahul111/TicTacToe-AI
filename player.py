@@ -4,6 +4,9 @@ from network import Network
 class Player:
 	def __init__(self, code):
 		self.code = code # for identifying O and X
+		self.games = 0
+		# self.score = [0,0,0] # [win, draw, lose]
+		self.score = 0 # 3-win,2-draw,1-lose
 		pass
 
 	# will return (x,y) in the grid as a choice
