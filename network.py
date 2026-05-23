@@ -54,12 +54,9 @@ class Network():
 		activation = self.sigmoid(activation)
 		return activation
 
-	def mutate(self, copies, diversity=.1):
-		networks = []
-		for i in range(copies):
-			net = Network(*self.design)
-			for i in range(len(self.layers)):
-				net.layers[i].weights = self.layers[i].weights * (1+diversity*random())
-				net.layers[i].biases = self.layers[i].biases * (1+diversity*random())
-				networks.append(net)
-		return networks
+	def mutate(self, diversity=.1):
+		net = Network(*self.design)
+		for i in range(len(self.layers)):
+			net.layers[i].weights = self.layers[i].weights * (1+diversity*random())
+			net.layers[i].biases = self.layers[i].biases * (1+diversity*random())
+		return net

@@ -1,16 +1,49 @@
 from player import Human, Agent
 from game import Game
+from random import choices
+
+# takes the best players
+# adds some mutations and random players
+# makes them compete, returns the best player
+def evolve(gen_count, top_agent):
+	print(f"Generation: {gen_count}, Last top agent score: {top_agent.score}")
+	top_agent.reset_score()
+	agents = top_agent.mutate(10, .5) + [Agent() for _ in range(5)]
+
+	# matchmaking
+	for agent1 in agents:
+		for agent2 in agents:
+			game.match(agent1, agent2)
+			game.match(agent2, agent1)
+	
+	# print agent status
+	# for agent in agents:
+	# 	print(f"Agent {agent.code} Games: {agent.games}, Score: {agent.score}")
+	
+	return max(agents, key=lambda agent: agent.score)
 
 
 game = Game()
 
-# human_player = Human(code=1)
-agent1 = Agent(code=1)
-agent2 = Agent(code=-1)
-for i in range(25):
-	game.match(agent1, agent2)
-for i in range(25):
-	game.match(agent2, agent1)
-# game.draw()
-print(f"Agent 1: {agent1.score}")
-print(f"Agent 2: {agent2.score}")
+top_agent = Agent()
+generations = 50
+print("Generation Count:", generations)
+for i in range(generations):
+	top_agent = evolve(i+1,top_agent)
+	# print(f"Agent {top_agent.code} Games: {top_agent.games}, Score: {top_agent.score}")
+
+
+# play top_agent with random player
+top_agent.reset_score()
+random_count = 3
+for i in range(random_count):
+	random = Agent(f"Random {i}")
+	print("Random (O) v Top Agent (X)")
+	game.match(random, top_agent, draw_board=True)
+	print("Top Agent (O) v Random (X)")
+	game.match(top_agent, random, draw_board=True)
+
+print(f"Top agent score for {random_count} random players: {top_agent.score}")
+# play the best agent with human
+# human_player = Human("Human")
+# game.match(top_agent, human_player, draw_board=True)

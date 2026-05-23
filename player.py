@@ -18,6 +18,11 @@ class Player:
 	def move(self, grid):
 		pass
 
+	def reset_score(self):
+		# self.games = 0 # maybe not needed
+		self.score = 0
+
+
 class Human(Player):
 	def __init__(self, code):
 		super().__init__(code)
@@ -27,11 +32,11 @@ class Human(Player):
 		return (x-1, y-1)
 
 class Agent(Player):
-	def __init__(self):
-		super().__init__(generate_id())
+	def __init__(self, code=None):
+		super().__init__(code or generate_id())
 		# 9 inputs for each cell having (-1,0,1)
 		# 9 outputs as probabilities
-		self.network = Network(9,2,9)
+		self.network = Network(9,16,9)
 	
 	def move(self, grid):
 		# move logic
@@ -52,6 +57,15 @@ class Agent(Player):
 		# print(index)
 		# print(f"p[{x}][{y}] = {probabilities[x][y]}")
 		return (x,y)
+	
+	def mutate(self, copies, diversity=.1):
+		agents = []
+		for i in range(copies):
+			agent = Agent()
+			agent.network = self.network.mutate(diversity)
+			agents.append(agent)
+		return agents
+
 
 if __name__ == "__main__":
 	import numpy as np
