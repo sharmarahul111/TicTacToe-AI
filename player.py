@@ -51,7 +51,7 @@ class Agent(Player):
 		super().__init__(code or generate_id())
 		# 9 inputs for each cell having (-1,0,1)
 		# 9 outputs as probabilities
-		self.network = Network(9,18,9)
+		self.network = Network(9,9,9,9)
 	
 	def move(self, grid):
 		# move logic
