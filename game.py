@@ -13,7 +13,7 @@ class Game:
 		for i in range(self.grid.shape[0]):
 			for j in range(self.grid.shape[1]):
 				self.grid[i][j] = choice([0,1,-1])
-				# print(j)
+
 	def draw(self):
 		print("-"*13)
 		for g in self.grid:
@@ -27,7 +27,16 @@ class Game:
 			print()
 			print("-"*13)
 
-# pass player class objecs instead of 0 and 1 as players
-game = Game(0,1)
-game.randomize()
-game.draw()
+	def play(self, player):
+		# it is expected that the players return valid move
+		(x,y) = player.move(self.grid)
+		self.grid[x][y] = player.code
+
+	def match(self):
+		# this method handles the complete start to finish of the match logic
+		# logic for game completion and assigning wins/losses
+		for i in range(9):
+			self.play(self.player_A)
+			self.draw()
+			self.play(self.player_B)
+			self.draw()
