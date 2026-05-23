@@ -1,13 +1,11 @@
 import numpy as np
 from random import choice
 class Game:
-	def __init__(self, player_A, player_B):
+	def __init__(self):
 		# 0 = empty
 		# 1 = player_A
 		# -1 = player_B
 		self.grid = np.zeros((3,3), dtype=int)
-		self.player_A = player_A
-		self.player_B = player_B
 		self.turn = True # True = Player A, False = Player B
 	
 	def randomize(self):
@@ -28,26 +26,19 @@ class Game:
 			print()
 			print("-"*13)
 
-	def play(self):
-		# turn = True for player A, False for player B
-		player = self.player_A
-		if not self.turn:
-			player = self.player_B
-		self.turn = not self.turn # change the turn for next round
+	def play(self, player, code):
 		# it is expected that the players return valid move
 		(x,y) = player.move(self.grid)
-		self.grid[x][y] = player.code
-		# return (x,y)
+		self.grid[x][y] = code
 
 	def check_game_over(self):
-		game_over = False
 		# print(np.count_nonzero(self.grid))
 		# check if the cells are filled
 		if np.count_nonzero(self.grid) == 9:
 			return True
 		if self.check_match_three():
 			game_over = True
-		return game_over
+		return False # the game isn't over
 	
 	def check_match_three(self):
 		winner = 0
@@ -79,27 +70,32 @@ class Game:
 		return winner
 
 
-	def match(self, mode="silent"):
+	def match(self, player1, player2):
 		# this method handles the complete start to finish of the match logic
 		# logic for game completion and assigning wins/losses
 		while not self.check_game_over():
-			self.play()
-			# for visual purpose
-			if mode != "silent":
-				self.draw()
+			if self.turn:
+				self.play(player1, 1) # player1 = 1
+			else:
+				self.play(player2, -1) # player2 = -1
+			self.turn = not self.turn # change the turn for next round
+
 		score = self.check_match_three()
 		# print("Game score: ", self.check_match_three())
 		# assuming player_A = 1, player_B = -1
-
-		self.player_A.games += 1
-		self.player_B.games += 1
+		# TODO: play with different scoring system
+		player1.games += 1
+		player2.games += 1
 		if score == 1:
-			self.player_A.score += 3
-			self.player_B.score += 1
+			player1.score += 3
+			player2.score += 0
 		elif score == -1:
-			self.player_A.score += 1
-			self.player_B.score += 3
+			player1.score += 1
+			player2.score += 0
 		else:
-			self.player_A.score += 2
-			self.player_B.score += 2
+			player1.score += 1
+			player2.score += 1
 
+	def reset(self):
+		self.turn = True
+		self.grid = np.zeros(3,3)
