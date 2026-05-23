@@ -1,5 +1,9 @@
 from numpy import argmax
 from network import Network
+from random import choices
+
+def generate_id():
+	return ''.join(choices("0123456789ABCDEF", k=8))
 # Acts as a base class / interface for all kinds of players (agents, human)
 class Player:
 	def __init__(self, code):
@@ -19,11 +23,12 @@ class Human(Player):
 		super().__init__(code)
 	
 	def move(self, grid):
-		return (int(input("x:")), int(input("y:")))
+		(y,x) = (int(input("x:")), int(input("y:")))
+		return (x-1, y-1)
 
 class Agent(Player):
-	def __init__(self, code):
-		super().__init__(code)
+	def __init__(self):
+		super().__init__(generate_id())
 		# 9 inputs for each cell having (-1,0,1)
 		# 9 outputs as probabilities
 		self.network = Network(9,2,9)
