@@ -10,7 +10,7 @@ class Network():
 		self.design = args
 		self.layers = []
 		for i in range(1,len(args)):
-			weights = np.random.randn(args[i-1], args[i])*.5
+			weights = np.random.randn(args[i-1], args[i])*.2
 			biases = np.zeros(args[i])
 			self.layers.append(Layer(weights, biases))
 	
