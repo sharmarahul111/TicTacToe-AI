@@ -1,4 +1,5 @@
 import numpy as np
+from random import random
 class Layer:
 	def __init__(self, weights=None, biases=None):
 		self.weights = weights
@@ -52,3 +53,13 @@ class Network():
 		activation = activation @ self.layers[-1].weights + self.layers[-1].biases
 		activation = self.sigmoid(activation)
 		return activation
+
+	def mutate(self, copies, diversity=.1):
+		networks = []
+		for i in range(copies):
+			net = Network(*self.design)
+			for i in range(len(self.layers)):
+				net.layers[i].weights = self.layers[i].weights * (1+diversity*random())
+				net.layers[i].biases = self.layers[i].biases * (1+diversity*random())
+				networks.append(net)
+		return networks
