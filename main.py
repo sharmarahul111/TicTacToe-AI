@@ -1,9 +1,9 @@
-from player import Human
+from player import Human, Agent
 from game import Game
 
 
 human_player = Human(code=1)
-human_player2 = Human(code=-1)
-game = Game(human_player, human_player2)
+agent = Agent(code=-1)
+game = Game(human_player, agent)
 game.match()
 game.draw()

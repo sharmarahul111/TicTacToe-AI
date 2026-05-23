@@ -31,12 +31,20 @@ class Game:
 		# it is expected that the players return valid move
 		(x,y) = player.move(self.grid)
 		self.grid[x][y] = player.code
+		# return (x,y)
 
 	def match(self):
 		# this method handles the complete start to finish of the match logic
 		# logic for game completion and assigning wins/losses
 		for i in range(9):
 			self.play(self.player_A)
-			self.draw()
 			self.play(self.player_B)
-			self.draw()
+			# for visual purpose
+			# (x,y) = self.play(self.player_A)
+			# print(f"Player A: {x}, {y}")
+			# self.draw()
+			# print()
+			# (x,y) = self.play(self.player_B)
+			# print(f"Player B: {x}, {y}")
+			# self.draw()
+			# print("--------------------")
