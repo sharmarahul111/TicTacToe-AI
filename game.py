@@ -95,7 +95,9 @@ class Game:
 		else:
 			player1.score += 1
 			player2.score += 1
+		
+		self.reset() # reset the board for new games
 
 	def reset(self):
 		self.turn = True
-		self.grid = np.zeros(3,3)
+		self.grid = np.zeros((3,3), dtype=int)
