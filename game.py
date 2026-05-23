@@ -37,7 +37,7 @@ class Game:
 		if np.count_nonzero(self.grid) == 9:
 			return True
 		if self.check_match_three():
-			game_over = True
+			return True
 		return False # the game isn't over
 	
 	def check_match_three(self):
@@ -103,7 +103,7 @@ class Game:
 			if score==1:
 				print("Winner: ", player1.code)
 			elif score==-1:
-				print("Winner: ", player1.code)
+				print("Winner: ", player2.code)
 			else:
 				print("Draw")
 
