@@ -2,7 +2,7 @@ from player import Human, Agent
 from game import Game
 from random import choices, sample
 
-top_agent_count = 5
+top_agent_count = 10
 opponents = [Agent() for _ in range(100)]
 # opponents = [Agent() for _ in range(1000)]
 # import pickle
@@ -36,7 +36,7 @@ def evolve(gen_count, top_agents):
 game = Game()
 
 top_agents = [Agent()]*top_agent_count
-generations = 20
+generations = 10
 print("Generation Count:", generations)
 for i in range(generations):
 	top_agents = evolve(i+1,top_agents)
@@ -44,24 +44,27 @@ for i in range(generations):
 
 
 # play top_agent with benchmark agents
-
+import pickle
+benchmark_agents = None
+with open("benchmark_agents.pkl", "rb") as f:
+	benchmark_agents = pickle.load(f)
+print(f"[INFO] Loaded {len(benchmark_agents)} agents.")
 top_agent = max(top_agents, key=lambda a: a.fitness())
 top_agent.reset_score()
-random_count = 1000
-for i in range(random_count):
-	random = Agent(f"Random {i}")
-	game.match(random, top_agent)
-	game.match(top_agent, random)
+for agent in benchmark_agents:
+	game.match(agent, top_agent)
+	game.match(top_agent, agent)
 
 
 # for i in range(2):
-# 	random = Agent(f"Random {i}")
-# 	print("Random (O) v Top Agent (X): ", end="")
-# 	game.match(random, top_agent, draw_board=True, print_result=True)
-# 	print("Top Agent (O) v Random (X): ", end="")
-# 	game.match(top_agent, random, draw_board=True, print_result=True)
+# top_agents[0].code = "Top Agent 1"
+# top_agents[1].code = "Top Agent 2"
+# print("Top Agent 1 (O) v Top Agent 2 (X): ", end="")
+# game.match(top_agents[0], top_agents[1], draw_board=True, print_result=True)
+# print("Top Agent 2 (O) v Top Agent 1 (X): ", end="")
+# game.match(top_agents[1], top_agents[0], draw_board=True, print_result=True)
 
-print(f"Top agent score for {random_count} random players:")
+print(f"Top agent score for {len(benchmark_agents)} random players:")
 print(top_agent)
 # play the best agent with human
 # human_player = Human("Human")
