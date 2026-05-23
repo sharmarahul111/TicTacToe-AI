@@ -9,8 +9,8 @@ class Player:
 	def __init__(self, code):
 		self.code = code # for identifying O and X
 		self.games = 0
-		# self.score = [0,0,0] # [win, draw, lose]
-		self.score = 0 # 3-win,2-draw,1-lose
+		self.score = [0,0,0] # [win, draw, lose]
+		# self.score = 0 # 3-win,2-draw,1-lose
 		pass
 
 	# will return (x,y) in the grid as a choice
@@ -19,8 +19,21 @@ class Player:
 		pass
 
 	def reset_score(self):
-		# self.games = 0 # maybe not needed
-		self.score = 0
+		self.games = 0 # maybe not needed
+		self.score = [0,0,0]
+	
+	def __str__(self):
+		s = "Player: "+self.code
+		s+= f"\n\t Games = {self.games}"
+		s+= f"\n\t Wins = {self.score[0]}"
+		s+= f"\n\t Draws = {self.score[1]}"
+		s+= f"\n\t Loss = {self.score[2]}"
+		return s
+	
+	def fitness(self):
+		return self.score[0]*4
+		self.score[1]*1
+		self.score[2]*0
 
 
 class Human(Player):
@@ -36,7 +49,7 @@ class Agent(Player):
 		super().__init__(code or generate_id())
 		# 9 inputs for each cell having (-1,0,1)
 		# 9 outputs as probabilities
-		self.network = Network(9,16,9)
+		self.network = Network(9,16,16,9)
 	
 	def move(self, grid):
 		# move logic

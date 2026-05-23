@@ -70,7 +70,7 @@ class Game:
 		return winner
 
 
-	def match(self, player1, player2, draw_board=False):
+	def match(self, player1, player2, draw_board=False, print_result=False):
 		# this method handles the complete start to finish of the match logic
 		# logic for game completion and assigning wins/losses
 		while not self.check_game_over():
@@ -90,16 +90,16 @@ class Game:
 		player1.games += 1
 		player2.games += 1
 		if score == 1:
-			player1.score += 3
-			player2.score += 0
+			player1.score[0] += 1
+			player2.score[2] += 1
 		elif score == -1:
-			player1.score += 1
-			player2.score += 0
+			player1.score[2] += 1
+			player2.score[0] += 1
 		else:
-			player1.score += 1
-			player2.score += 1
+			player1.score[1] += 1
+			player2.score[1] += 1
 		
-		if draw_board:
+		if draw_board or print_result:
 			if score==1:
 				print("Winner: ", player1.code)
 			elif score==-1:
