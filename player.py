@@ -32,8 +32,8 @@ class Player:
 	
 	def fitness(self):
 		win = 10
-		draw = 3
-		loss = -10
+		draw = 5
+		loss = -30
 		if self.games == 0: return 0
 		return (self.score[0]*win +self.score[1]*draw +self.score[2]*loss)/self.games
 

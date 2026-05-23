@@ -2,8 +2,8 @@ from player import Human, Agent
 from game import Game
 from random import choices, sample
 
-top_agent_count = 10
-opponents = [Agent() for _ in range(100)]
+top_agent_count = 6
+opponents = [Agent() for _ in range(60)]
 # opponents = [Agent() for _ in range(1000)]
 # import pickle
 # with open("benchmark_agents.pkl", "wb") as f:
@@ -11,15 +11,12 @@ opponents = [Agent() for _ in range(100)]
 # print("Saved 1000 benchmark agents")
 
 # exit()
-# takes the best players
-# adds some mutations and random players
-# makes them compete, returns the best player
 def evolve(gen_count, top_agents):
 	print(f"Generation: {gen_count}, Last top agent ({top_agents[0].fitness()}): {top_agents[0]}")
 	agents = top_agents.copy()
 	for top_agent in top_agents:
-		agents += top_agent.mutate(6, diversity=.01) + top_agent.mutate(2,diversity=.15)
-	# opponents = [Agent() for _ in range(10)]
+		agents += top_agent.mutate(6, diversity=.012) + top_agent.mutate(2,diversity=.15)
+	# opponents = [Agent() for _ in range(30)]
 
 	for a in agents:
 		a.reset_score()
@@ -36,7 +33,7 @@ def evolve(gen_count, top_agents):
 game = Game()
 
 top_agents = [Agent()]*top_agent_count
-generations = 10
+generations = 30
 print("Generation Count:", generations)
 for i in range(generations):
 	top_agents = evolve(i+1,top_agents)
@@ -67,5 +64,6 @@ for agent in benchmark_agents:
 print(f"Top agent score for {len(benchmark_agents)} random players:")
 print(top_agent)
 # play the best agent with human
-# human_player = Human("Human")
-# game.match(top_agent, human_player, draw_board=True)
+# while(input("Play more? ") == '1'):
+# 	human_player = Human("Human")
+# 	game.match(top_agent, human_player, draw_board=True)

@@ -28,8 +28,13 @@ class Game:
 
 	def play(self, player, code):
 		# it is expected that the players return valid move
-		(x,y) = player.move(self.grid)
-		self.grid[x][y] = code
+		if code == -1:
+			(x,y) = player.move(-self.grid)
+			self.grid[x][y] = code
+		else:
+			(x,y) = player.move(self.grid)
+			self.grid[x][y] = code
+
 
 	def check_game_over(self):
 		# print(np.count_nonzero(self.grid))
