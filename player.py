@@ -158,7 +158,9 @@ class Algorithm(Player):
 
 	def move(self, grid):
 		legals = np.argwhere(grid == 0)
+		if random()>.0 and grid[1][1] == 0: return (1,1)
 		move_pool = []
+		# print("Looking for winning moves...")
 		for (x,y) in legals:
 			# print(f"x={x} y={y} Row:", grid[x], end=", ")
 			# print("Col:", grid[:,y])
@@ -175,6 +177,7 @@ class Algorithm(Player):
 
 		if len(move_pool):
 			return choice(move_pool)
+		# print("Looking for blocking...")
 		
 		for (x,y) in legals:
 			# if no winning moves, then check blocking
@@ -190,6 +193,14 @@ class Algorithm(Player):
 
 		if len(move_pool):
 			return choice(move_pool)
+		# print("Looking for one self and two empty cells...")
+		corners = set([
+			(0,0),
+			(2,2),
+			(0,2),
+			(2,0),
+			(1,1) # technically not a corner but good place to capture
+		])
 
 			# if there is only one move by self in that diagonal and no opponent move
 			# sum is 1 only if there is one move by self, otherwise +1+1-1 won't give any legal moves there
@@ -204,14 +215,25 @@ class Algorithm(Player):
 			if x+y==2 and (grid[0][2]+grid[1][1]+grid[2][0] == 1):
 				move_pool.append((x,y))
 		
-		if len(move_pool):
+		available_corners = corners.intersection(set([(x,y) for [x,y] in move_pool]))
+		if len(available_corners):
+			return choice(list(available_corners))
+		elif len(move_pool):
 			return choice(move_pool)
+		# print("Sending corner moves...")
+		
+
+
+		# print("Sending random moves...")
 
 		# print("Row sum:", np.sum(grid[x]))
 		# print("Col sum:", np.sum(grid[:,y]))
 		# if above strategies don't work, return a random choice
-		(x,y) = choice(legals)
-		return (x,y)
+		available_corners = corners.intersection(set([(x,y) for [x,y] in legals]))
+		if len(available_corners):
+			return choice(list(available_corners))
+		else:
+			return choice(legals)
 
 			
 if __name__ == "__main__":
