@@ -5,7 +5,7 @@ unique_boards = set()
 dataset = {}
 root_node = ((0,0,0),(0,0,0),(0,0,0))
 # root_node = ((1,-1,1),(1,0,0),(0,0,0))
-root_node = ((-1,1,-1),(0,1,0),(0,-1,1))
+# root_node = ((-1,1,-1),(0,1,0),(0,-1,1))
 print(f"[INFO] Starting with root node: {root_node}")
 search_list = [root_node]
 # returns 0 if game isn't over
@@ -151,5 +151,12 @@ print(f"[INFO] Proceeding to classify [win,draw,loss] cases...")
 classify_board(root_node)
 print(f"[INFO] Done classifying...")
 print(f"[INFO] For current position we have a forced [{ dataset[root_node]['forced']}]")
-for d,k in dataset.items():
-	print(d, k)
+# for d,k in dataset.items():
+# 	print(d, k)
+
+import pickle
+print(f"[INFO] Saving dataset into dataset.pkl ...")
+with open("dataset.pkl", "wb") as f:
+	pickle.dump(dataset, f)
+
+print(f"[INFO] Saved successfully ...")
