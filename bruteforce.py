@@ -5,7 +5,8 @@ unique_boards = set()
 dataset = {}
 root_node = ((0,0,0),(0,0,0),(0,0,0))
 # root_node = ((1,-1,1),(1,0,0),(0,0,0))
-# root_node = ((-1,1,-1),(0,1,0),(0,-1,1))
+# root_node = ((1,1,-1),(0,-1,0),(1,0,0))
+# root_node = ((1, 1, -1), (-1, -1, 0), (1, 0, 0))
 print(f"[INFO] Starting with root node: {root_node}")
 search_list = [root_node]
 # returns 0 if game isn't over
@@ -64,9 +65,11 @@ def play(tup):
 
 
 # score = [win, draw, loss] for first player as 1
-def get_score(code):
+def get_score(code, player=1):
+	if code == "draw": code = 2
+	code *= player
 	if code == 1: return "win"
-	elif code == "draw": return "draw"
+	elif code == 2 or code == -2: return "draw"
 	elif code == -1: return "loss"
 	else:
 		print(code)
@@ -74,7 +77,7 @@ def get_score(code):
 
 def classify_board(board):
 	if check_end(board):
-		dataset[board]["forced"] = get_score(check_end(board))
+		dataset[board]["forced"] = get_score(check_end(board), get_player(board))
 		return dataset[board]["forced"]
 	# return the scores if this position is already evaluated
 	if dataset[board]["done"]:
@@ -150,13 +153,27 @@ print(f"[INFO] Added to dataset...")
 print(f"[INFO] Proceeding to classify [win,draw,loss] cases...")
 classify_board(root_node)
 print(f"[INFO] Done classifying...")
-print(f"[INFO] For current position we have a forced [{ dataset[root_node]['forced']}]")
-# for d,k in dataset.items():
-# 	print(d, k)
+player = get_player(root_node)
+print(f"[INFO] For current position ({player}) we have a forced [{ dataset[root_node]['forced']}]")
 
-import pickle
-print(f"[INFO] Saving dataset into dataset.pkl ...")
-with open("dataset.pkl", "wb") as f:
-	pickle.dump(dataset, f)
+# get immediate dataset positions printed
+# immediate_datasets = {}
+# root_board_list = [list(b) for b in root_node]
+# for (i,j) in dataset[root_node]["legal_moves"]:
+# 	root_board_list[i][j] = player
+# 	tpl = tuple([tuple(l) for l in root_board_list])
+# 	immediate_datasets[tpl] = dataset[tpl]
+# 	root_board_list[i][j] = 0
 
-print(f"[INFO] Saved successfully ...")
+# for d in immediate_datasets:
+# 	print(d, f"[forced:{dataset[d]['forced']}]")
+# 	print("\twin:",dataset[d]["win"])
+# 	print("\tdraw:",dataset[d]["draw"])
+# 	print("\tloss:",dataset[d]["loss"])
+
+# import pickle
+# print(f"[INFO] Saving dataset into dataset.pkl ...")
+# with open("dataset.pkl", "wb") as f:
+# 	pickle.dump(dataset, f)
+
+# print(f"[INFO] Saved successfully ...")
