@@ -32,16 +32,23 @@ class Player:
 		s+= f", Draws = {self.score[1]}"
 		s+= f", Loss = {self.score[2]}"
 		return s
-	
+
 	def fitness(self):
-		# factors
 		win = 10
 		draw = 5
 		loss = -20
-		bias = 5 # comes from good/bad behaviour rewards
-		if self.games == 0: return 0
-		return (self.score[0]*win +self.score[1]*draw +self.score[2]*loss+self.bias*bias)/self.games
 
+		if self.games == 0:
+			return 0
+
+		game_score = (
+			self.score[0] * win +
+			self.score[1] * draw +
+			self.score[2] * loss
+		)
+		game_score /= self.games
+		bias_score = self.bias / self.games  # normalize properly
+		return game_score + 0.5 * bias_score
 
 class Human(Player):
 	def __init__(self, code):
