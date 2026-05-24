@@ -2,7 +2,7 @@ from player import Human, Agent
 from game import Game
 from random import choices, sample
 
-top_agent_count = 2
+top_agent_count = 3
 opponents = [Agent() for _ in range(50)]
 # opponents = [Agent() for _ in range(3000)]
 # import pickle
@@ -23,7 +23,7 @@ def evolve(gen_count, top_agents):
 
 	# matchmaking
 	for agent1 in agents:
-		for agent2 in opponents + top_agents + [Agent()]*5:
+		for agent2 in opponents + top_agents + [Agent() for _ in range(5)]:
 			game.match(agent1, agent2)
 			game.match(agent2, agent1)
 	
@@ -32,8 +32,8 @@ def evolve(gen_count, top_agents):
 
 game = Game()
 
-top_agents = [Agent()]*top_agent_count
-generations = 500
+top_agents = [Agent() for _ in range(top_agent_count)]
+generations = 100
 print("Generation Count:", generations)
 for i in range(generations):
 	top_agents = evolve(i+1,top_agents)

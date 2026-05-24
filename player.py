@@ -1,6 +1,7 @@
 from numpy import argmax
 from network import Network
-from random import choices
+from random import random,choices
+from numpy.random import rand
 
 def generate_id():
 	return ''.join(choices("0123456789ABCDEF", k=8))
@@ -33,7 +34,7 @@ class Player:
 	def fitness(self):
 		win = 10
 		draw = 5
-		loss = -30
+		loss = -20
 		if self.games == 0: return 0
 		return (self.score[0]*win +self.score[1]*draw +self.score[2]*loss)/self.games
 
@@ -64,11 +65,17 @@ class Agent(Player):
 				# set non clear cells probability to 0 or -inf
 				if grid[i][j] != 0:
 					probabilities[i][j] = 0 # -inf for non sigmoid outputs
-		# probability matrix
-		# print(probabilities)
 		# getting the highest probability index
 		index = argmax(probabilities) # returns flat array index
 		(x,y) = (index//3, index%3) # convert flat index to 2D
+
+		# add some variation in play (pick second best move)
+		# if random()>.99:
+		# 	print("randomized")
+		# 	probabilities[x][y] = 0
+		# 	index = argmax(probabilities) # returns flat array index
+		# 	(x,y) = (index//3, index%3)
+
 		# print(index)
 		# print(f"p[{x}][{y}] = {probabilities[x][y]}")
 		return (x,y)
@@ -81,7 +88,20 @@ class Agent(Player):
 			agents.append(agent)
 		return agents
 
+class RandomPlayer(Player):
+	def __init__(self):
+		super().__init__(self, "RANDOM")
 
+	def move(self, grid):
+		choice = rand(3,3)
+		for i in range(3):
+			for j in range(3):
+				# set non clear cells probability to 0 or -inf
+				if grid[i][j] != 0:
+					choice[i][j] = 0 
+		index = argmax(probabilities) # returns flat array index
+		(x,y) = (index//3, index%3)
+		return (x,y)
 if __name__ == "__main__":
 	import numpy as np
 	from random import choice
