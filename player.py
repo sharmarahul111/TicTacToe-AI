@@ -235,6 +235,39 @@ class Algorithm(Player):
 		else:
 			return choice(legals)
 
+class Bruteforce(Player):
+	def __init__(self):
+		super().__init__("Bruteforce")
+		self.dataset = {}
+		import pickle
+		with open("dataset.pkl", "rb") as f:
+			self.dataset = pickle.load(f)
+	
+	def get_player(self,board):
+		count = 0
+		for row in board:
+			for cell in row:
+				if cell != 0:
+					count += 1
+
+		return 1 if count % 2 == 0 else -1
+
+	def move(self, grid):
+		new_grid = grid.copy()
+		if self.get_player(grid) == -1:
+			new_grid = -new_grid
+		tpl = tuple([tuple(t) for t in new_grid])
+
+		if not (tpl in self.dataset):
+			raise "Dataset Incomplete"
+		# print(self.dataset[tpl])
+		moves = self.dataset[tpl]
+		if moves["win"]: return choice(moves["win"])
+		elif moves["draw"]: return choice(moves["draw"])
+		elif moves["loss"]: return choice(moves["loss"])
+		else:
+			raise "Move not found in dataset"
+
 			
 if __name__ == "__main__":
 	import numpy as np
