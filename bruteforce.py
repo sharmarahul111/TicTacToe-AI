@@ -31,6 +31,15 @@ def check_end(tup):
 	
 	return "draw"
 
+def get_player(board):
+	count = 0
+	for row in board:
+		for cell in row:
+			if cell != 0:
+				count += 1
+
+	return 1 if count % 2 == 0 else -1
+
 def get_legal_moves(tup) -> list[tuple]:
 	if check_end(tup):
 		return []
@@ -46,10 +55,7 @@ def play(tup):
 	board_positions = []
 	# convert to list for alteration
 	lst = [list(l) for l in tup]
-	player = 1 # assume first player's turn
-	if len(legal_moves) % 2 == 0:
-		# second player's turn (1)
-		player = -1
+	player = get_player(tup)
 	for (i,j) in legal_moves:
 		lst[i][j] = player
 		board_positions.append(tuple([tuple(l) for l in lst]))
@@ -73,44 +79,39 @@ def classify_board(board):
 	if check_end(board):
 		return get_score(check_end(board))
 	# return the scores if this position is already evaluated
-	if len(dataset[board]["legal_moves"]) == 0:
-		return [
-			len(dataset[board]["win"]),
-			len(dataset[board]["draw"]),
-			len(dataset[board]["loss"]),
-		]
+	if dataset[board]["done"]:
+		return dataset[board]["score"]
 	# listify the board from tuple
 	board_list = [list(b) for b in board]
 
-	player = 1 # assume first player's turn
-	if len(dataset[board]["legal_moves"]) % 2 == 0:
-		# second player's turn (1)
-		player = -1
+	player = get_player(board)
 	
 	# score = dataset[board]["score"]
 	# recursively dig deeper into each legal board positions
-	while(dataset[board]["legal_moves"]):
-		(i,j) = dataset[board]["legal_moves"].pop()
+	for (i,j) in dataset[board]["legal_moves"]:
+		# (i,j) = dataset[board]["legal_moves"].pop()
 		board_list[i][j] = player
 		score = classify_board(tuple([tuple(l) for l in board_list]))
+		# if board == root_node:
+		print(score)
 		# depending on whose turn is to play, win-loss may differ
 		dataset[board]["turn"] = player
-		if player == 1:
-			if score[1] == 0 and score[2] == 0:
+		if player == -1:
+			if score[0]:
 				dataset[board]["win"].append((i,j))
-			elif score[2] == 0:
+			elif score[1]:
 				dataset[board]["draw"].append((i,j))
 			else:
 				dataset[board]["loss"].append((i,j))
 		else:
-			if score[0] == 0 and score[1] == 0:
+			if score[2]:
 				dataset[board]["win"].append((i,j))
-			elif score[0] == 0:
+			elif score[1]:
 				dataset[board]["draw"].append((i,j))
 			else:
 				dataset[board]["loss"].append((i,j))
 		board_list[i][j] = 0
-
+	dataset[board]["done"] = True
 	# print(dataset[board])
 	dataset[board]["score"] = [
 			len(dataset[board]["win"]),
@@ -145,7 +146,8 @@ for board in unique_boards:
 		"draw": [],
 		"loss": [],
 		"turn": 1,
-		"score": [0,0,0]
+		"score": [0,0,0],
+		"done": False
 	}
 print(f"[INFO] Added to dataset...")
 print(f"[INFO] Proceeding to classify [win,draw,loss] cases...")
