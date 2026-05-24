@@ -90,7 +90,7 @@ class Agent(Player):
 
 class RandomPlayer(Player):
 	def __init__(self):
-		super().__init__(self, "RANDOM")
+		super().__init__("RANDOM")
 
 	def move(self, grid):
 		choice = rand(3,3)
@@ -99,7 +99,7 @@ class RandomPlayer(Player):
 				# set non clear cells probability to 0 or -inf
 				if grid[i][j] != 0:
 					choice[i][j] = 0 
-		index = argmax(probabilities) # returns flat array index
+		index = argmax(choice) # returns flat array index
 		(x,y) = (index//3, index%3)
 		return (x,y)
 if __name__ == "__main__":
