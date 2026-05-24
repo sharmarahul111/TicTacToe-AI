@@ -64,91 +64,57 @@ def play(tup):
 
 
 # score = [win, draw, loss] for first player as 1
-def get_score(code,lst=None):
-	if not lst:
-		lst = [0,0,0]
-	if code == 1: lst[0]+=1
-	elif code == "draw": lst[1]+=1
-	elif code == -1: lst[2]+=1
+def get_score(code):
+	if code == 1: return "win"
+	elif code == "draw": return "draw"
+	elif code == -1: return "loss"
 	else:
 		print(code)
 		raise "Unknown code"
-	return lst
 
 def classify_board(board):
 	if check_end(board):
-		return get_score(check_end(board))
+		dataset[board]["forced"] = get_score(check_end(board))
+		return dataset[board]["forced"]
 	# return the scores if this position is already evaluated
 	if dataset[board]["done"]:
-		return dataset[board]["score"]
+		return dataset[board]["forced"]
 	# listify the board from tuple
 	board_list = [list(b) for b in board]
 
 	player = get_player(board)
 	
-	# score = dataset[board]["score"]
+	wins = 0
+	draws = 0
+	losses = 0
 	# recursively dig deeper into each legal board positions
 	for (i,j) in dataset[board]["legal_moves"]:
 		# (i,j) = dataset[board]["legal_moves"].pop()
 		board_list[i][j] = player
 		tpl = tuple([tuple(l) for l in board_list])
-		score = classify_board(tpl)
-		# if board == root_node:
-		print(score)
+		forced = classify_board(tpl)
 		# depending on whose turn is to play, win-loss may differ
 		dataset[board]["turn"] = player
-		if player == -1:
-			if score[1]==0 and score[2]==0:
-				dataset[board]["forced"] = "win"
-				dataset[board]["win"].append((i,j))
-			elif score[2]==0:
-				dataset[board]["forced"] = "draw"
-				# be opportunitistic and choose a line which wins against dumb opponents
-				if score[0]:
-					dataset[board]["win-draw"].append((i,j))
-				else:
-					dataset[board]["draw"].append((i,j))
-			else:
-				dataset[board]["forced"] = "loss"
-				# be opportunitistic and choose a line which wins against dumb opponents
-				if score[0]:
-					dataset[board]["win-draw-loss"].append((i,j))
-				elif score[1]:
-					dataset[board]["draw-loss"].append((i,j))
-				else:
-					dataset[board]["loss"].append((i,j))
-			
+		if forced == "loss":
+			wins += 1
+			dataset[board]["win"].append((i,j))
+		elif forced == "draw":
+			draws += 1
+			dataset[board]["draw"].append((i,j))
 		else:
-			if score[0]==0 and score[1]==0:
-				dataset[board]["forced"] = "win"
-				dataset[board]["win"].append((i,j))
-			elif score[0]==0:
-				dataset[board]["forced"] = "draw"
-				# be opportunitistic and choose a line which wins against dumb opponents
-				if score[2]:
-					dataset[board]["win-draw"].append((i,j))
-				else:
-					dataset[board]["draw"].append((i,j))
-			else:
-				dataset[board]["forced"] = "loss"
-				# be opportunitistic and choose a line which wins against dumb opponents
-				if score[2]:
-					dataset[board]["win-draw-loss"].append((i,j))
-				elif score[1]:
-					dataset[board]["draw-loss"].append((i,j))
-				else:
-					dataset[board]["loss"].append((i,j))
+			losses += 1
+			dataset[board]["loss"].append((i,j))
 		
-		# reset change to board for next iteration
 		board_list[i][j] = 0
+	# reset change to board for next iteration
+	if wins > 0:
+		dataset[board]["forced"] = "win"
+	elif draws > 0:
+		dataset[board]["forced"] = "draw"
+	else:
+		dataset[board]["forced"] = "loss"
 	dataset[board]["done"] = True
-	# print(dataset[board])
-	dataset[board]["score"] = [
-			len(dataset[board]["win"]),
-			len(dataset[board]["draw"]),
-			len(dataset[board]["loss"]),
-		]
-	return dataset[board]["score"]
+	return dataset[board]["forced"]
 	
 	
 
@@ -172,22 +138,18 @@ print(f"[INFO] Adding unique board positions to dataset...")
 for board in unique_boards:
 	dataset[board] = {
 		"legal_moves": get_legal_moves(board),
-		"forced": "win/draw/loss",
+		"forced": "",
 		# move priority in this order
 		"win": [],
-		"win-draw": [],
 		"draw": [],
-		"win-draw-loss": [],
-		"draw-loss": [],
 		"loss": [],
 		"turn": 1,
-		"score": [0,0,0],
 		"done": False
 	}
 print(f"[INFO] Added to dataset...")
 print(f"[INFO] Proceeding to classify [win,draw,loss] cases...")
 classify_board(root_node)
 print(f"[INFO] Done classifying...")
-print(f"[INFO] For current position:", dataset[root_node]["score"])
+print(f"[INFO] For current position we have a forced [{ dataset[root_node]['forced']}]")
 for d,k in dataset.items():
 	print(d, k)
