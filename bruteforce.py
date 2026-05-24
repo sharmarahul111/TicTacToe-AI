@@ -1,20 +1,13 @@
 # 1 => favours first turn
 # -1 => favours second turn
-# possible status: unsearched, searching, searched, endgame
-dataset = {
-	# ((0,0,0),(0,0,0),(0,0,0)): {
-	# 	"status": "unsearched",
-	# 	"moves": {
-	# 		1:[],
-	# 		0:[],
-	# 		-1:[]
-	# 	}
-	# }
-}
-count = 0
-# search_list = [((0,0,0),(0,0,0),(0,0,0))]
-# search_list = [((-1,0,1),(0,1,0),(-1,0,0))]
-search_list = [((0,0,0),(0,0,0),(0,0,0))]
+
+unique_boards = set()
+dataset = {}
+root_node = ((0,0,0),(0,0,0),(0,0,0))
+# root_node = ((1,-1,1),(1,0,0),(0,0,0))
+root_node = ((-1,1,-1),(0,1,0),(0,-1,1))
+print(f"[INFO] Starting with root node: {root_node}")
+search_list = [root_node]
 # returns 0 if game isn't over
 def check_end(tup):
 	for i in range(3):
@@ -63,24 +56,101 @@ def play(tup):
 		lst[i][j] = 0
 	return board_positions
 
+
+# score = [win, draw, loss] for first player as 1
+def get_score(code,lst=None):
+	if not lst:
+		lst = [0,0,0]
+	if code == 1: lst[0]+=1
+	elif code == "draw": lst[1]+=1
+	elif code == -1: lst[2]+=1
+	else:
+		print(code)
+		raise "Unknown code"
+	return lst
+
+def classify_board(board):
+	if check_end(board):
+		return get_score(check_end(board))
+	# return the scores if this position is already evaluated
+	if len(dataset[board]["legal_moves"]) == 0:
+		return [
+			len(dataset[board]["win"]),
+			len(dataset[board]["draw"]),
+			len(dataset[board]["loss"]),
+		]
+	# listify the board from tuple
+	board_list = [list(b) for b in board]
+
+	player = 1 # assume first player's turn
+	if len(dataset[board]["legal_moves"]) % 2 == 0:
+		# second player's turn (1)
+		player = -1
+	
+	# score = dataset[board]["score"]
+	# recursively dig deeper into each legal board positions
+	while(dataset[board]["legal_moves"]):
+		(i,j) = dataset[board]["legal_moves"].pop()
+		board_list[i][j] = player
+		score = classify_board(tuple([tuple(l) for l in board_list]))
+		# depending on whose turn is to play, win-loss may differ
+		dataset[board]["turn"] = player
+		if player == 1:
+			if score[1] == 0 and score[2] == 0:
+				dataset[board]["win"].append((i,j))
+			elif score[2] == 0:
+				dataset[board]["draw"].append((i,j))
+			else:
+				dataset[board]["loss"].append((i,j))
+		else:
+			if score[0] == 0 and score[1] == 0:
+				dataset[board]["win"].append((i,j))
+			elif score[0] == 0:
+				dataset[board]["draw"].append((i,j))
+			else:
+				dataset[board]["loss"].append((i,j))
+		board_list[i][j] = 0
+
+	# print(dataset[board])
+	dataset[board]["score"] = [
+			len(dataset[board]["win"]),
+			len(dataset[board]["draw"]),
+			len(dataset[board]["loss"]),
+		]
+	return dataset[board]["score"]
+	
+	
+
 # print(search_list[0])
 # print(get_legal_moves(search_list[0]))
 # print(check_end(search_list[0]))
 # print(play(search_list[0]))
 
 
-# exit()
-unique_boards = set()
+print("[INFO] Exploring every legal moves...")
+count = 0
 while search_list and count < 2_000_000:
 	# moves = get_legal_moves(search_list[-1])
 	search_list += play(search_list[0])
 	# print(search_list.pop(0))
 	unique_boards.add(search_list.pop(0))
-	# search_list.pop(0)
 	count+=1
-	if count % 50000 == 0: print(count)
-print(count)
-print("Unique boards:", len(unique_boards))
-# print(play(search_list[0]))
-# for i in play(search_list[0]):
-# 	print(i)
+print(f"[INFO] {count} nodes were found...")
+print(f"[INFO] {len(unique_boards)} unique boards were found...")
+print(f"[INFO] Adding unique board positions to dataset...")
+for board in unique_boards:
+	dataset[board] = {
+		"legal_moves": get_legal_moves(board),
+		"win": [],
+		"draw": [],
+		"loss": [],
+		"turn": 1,
+		"score": [0,0,0]
+	}
+print(f"[INFO] Added to dataset...")
+print(f"[INFO] Proceeding to classify [win,draw,loss] cases...")
+classify_board(root_node)
+print(f"[INFO] Done classifying...")
+print(f"[INFO] For current position:", dataset[root_node]["score"])
+for d,k in dataset.items():
+	print(d, k)
