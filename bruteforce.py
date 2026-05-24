@@ -91,25 +91,55 @@ def classify_board(board):
 	for (i,j) in dataset[board]["legal_moves"]:
 		# (i,j) = dataset[board]["legal_moves"].pop()
 		board_list[i][j] = player
-		score = classify_board(tuple([tuple(l) for l in board_list]))
+		tpl = tuple([tuple(l) for l in board_list])
+		score = classify_board(tpl)
 		# if board == root_node:
 		print(score)
 		# depending on whose turn is to play, win-loss may differ
 		dataset[board]["turn"] = player
 		if player == -1:
-			if score[0]:
+			if score[1]==0 and score[2]==0:
+				dataset[board]["forced"] = "win"
 				dataset[board]["win"].append((i,j))
-			elif score[1]:
-				dataset[board]["draw"].append((i,j))
+			elif score[2]==0:
+				dataset[board]["forced"] = "draw"
+				# be opportunitistic and choose a line which wins against dumb opponents
+				if score[0]:
+					dataset[board]["win-draw"].append((i,j))
+				else:
+					dataset[board]["draw"].append((i,j))
 			else:
-				dataset[board]["loss"].append((i,j))
+				dataset[board]["forced"] = "loss"
+				# be opportunitistic and choose a line which wins against dumb opponents
+				if score[0]:
+					dataset[board]["win-draw-loss"].append((i,j))
+				elif score[1]:
+					dataset[board]["draw-loss"].append((i,j))
+				else:
+					dataset[board]["loss"].append((i,j))
+			
 		else:
-			if score[2]:
+			if score[0]==0 and score[1]==0:
+				dataset[board]["forced"] = "win"
 				dataset[board]["win"].append((i,j))
-			elif score[1]:
-				dataset[board]["draw"].append((i,j))
+			elif score[0]==0:
+				dataset[board]["forced"] = "draw"
+				# be opportunitistic and choose a line which wins against dumb opponents
+				if score[2]:
+					dataset[board]["win-draw"].append((i,j))
+				else:
+					dataset[board]["draw"].append((i,j))
 			else:
-				dataset[board]["loss"].append((i,j))
+				dataset[board]["forced"] = "loss"
+				# be opportunitistic and choose a line which wins against dumb opponents
+				if score[2]:
+					dataset[board]["win-draw-loss"].append((i,j))
+				elif score[1]:
+					dataset[board]["draw-loss"].append((i,j))
+				else:
+					dataset[board]["loss"].append((i,j))
+		
+		# reset change to board for next iteration
 		board_list[i][j] = 0
 	dataset[board]["done"] = True
 	# print(dataset[board])
@@ -142,8 +172,13 @@ print(f"[INFO] Adding unique board positions to dataset...")
 for board in unique_boards:
 	dataset[board] = {
 		"legal_moves": get_legal_moves(board),
+		"forced": "win/draw/loss",
+		# move priority in this order
 		"win": [],
+		"win-draw": [],
 		"draw": [],
+		"win-draw-loss": [],
+		"draw-loss": [],
 		"loss": [],
 		"turn": 1,
 		"score": [0,0,0],
